@@ -1,0 +1,88 @@
+---
+title: "Nipissing Marion"
+author: "Faizan Khalid Mohsin"
+date: "April 13, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+```{r cars}
+require(tableone)
+
+nordic = read.csv("Nordic.csv")
+str(nordic)
+attach(nordic)
+
+################## Selecting The lakes for each species based on the relative abundance.
+
+# First we do it for LakeTrout.
+a1 = 0.2
+LT_lakes = subset(nordic, LT_REL_ABUN > a1)
+
+# Next Walleye
+a2 = 0.3
+WAL_lakes = subset(nordic, WAL_REL_ABUN > a2)
+
+
+###################
+
+variables = c("SMELTER_DIST", "LAT", "ELEV", "AVGTEMP", "MEI")
+
+# Discriptive stuff for LT
+CreateTableOne(vars = variables, data=LT_lakes)
+summary(LT_lakes$LAT)
+summary(LT_lakes$MEI)
+summary(LT_lakes$AVGTEMP)
+
+# DIS for Walleye
+CreateTableOne(vars = variables, data=WAL_lakes)
+summary(WAL_lakes$LAT)
+summary(WAL_lakes$MEI)
+summary(WAL_lakes$AVGTEMP)
+
+# Linear Regression: FOr lake trout
+
+LT_model_0 = lm(LT_REL_ABUN ~  MEI, data = nordic)
+summary(LT_model_0)
+
+LT_model_1 = lm(LT_REL_ABUN ~ LAT + ELEV + MEI + AVGTEMP, data = nordic)
+summary(LT_model_1)
+
+LT_model_2 = lm(LT_REL_ABUN ~ LAT + ELEV + MEI, data = nordic)
+summary(LT_model_2)
+
+LT_model_3= lm(LT_REL_ABUN ~ LAT  + MEI, data = nordic)
+summary(LT_model_3)
+
+LT_model_4= lm(LT_REL_ABUN ~ LAT  + MEI + WAL_REL_ABUN, data = nordic)
+summary(LT_model_4)
+
+LT_model_5= lm(LT_REL_ABUN ~ LAT  + MEI + SMB_REL_ABUN, data = nordic)
+summary(LT_model_5)
+
+# Scatter plots to see the different realtionships 
+
+plot(MEI, LT_REL_ABUN)
+abline(LT_model_0)
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+
+LT_model_Diversity= lm(NUM_SPC ~ LAT  + MEI + SMB_REL_ABUN, data = nordic)
+summary(LT_model_Diversity)
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
